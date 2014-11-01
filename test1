@@ -1,0 +1,40 @@
+  SELECT distinct '',convert(varchar(8),a.haltDate,112) rq,a.classgroup,a.classNum,c.workCenterName,c.workCenterCode,d.haltcausecode,'' brand ,'' cl ,'' tjyyjl ,a.verifyHaltTime,a.verifyHaltTime,a.verifyHaltTime,a.verifyHaltTime,'30451','30451','30451','30451','1','1','1','1','1','1','4','','','','1',
+a.workTime GS,a.standardCapacity,'0'
+from Equ_Mat_EquHaltGY a
+LEFT  OUTER JOIN 
+(SELECT workCenterId,actualStartDate,actualStartClassGroup,actualStartClassLabel,sum(sharingOutput) cl
+ FROM Plt_ProductionWorkOrder 
+WHERE actualStartDate BETWEEN '2014-10-01 00:00:00.000' AND '2014-10-30 00:00:00.000'
+AND workOrderStatus='50'
+AND sharingOutput<>'0'
+GROUP BY workCenterId,actualStartDate,actualStartClassGroup,actualStartClassLabel) b ON (a.workCenterId=b.workCenterId and a.classGroup=b.actualStartClassGroup
+and a.classNum=b.actualStartClassLabel  and a.haltDate=b.actualStartDate )
+LEFT OUTER JOIN Bas_WorkCenterInfo C ON (a.workCenterId=c.id)
+LEFT OUTER JOIN Equ_Bas_HaltCauseInfo d ON (a.haltCauseId=d.id)
+WHERE a.haltDate BETWEEN '2014-10-01 00:00:00.000' AND '2014-10-30 00:00:00.000'
+AND a.haltStatusCode='20'
+AND c.workCenterName LIKE '%包装机%'
+ORDER BY rq,a.classnum,c.workcentername
+
+
+union all
+
+
+SELECT distinct '',convert(varchar(8),d.haltDate,112) rq,d.classgroup,d.classNum,h.workCenterName,h.workCenterCode,J.haltcausecode,'' brand ,'' cl ,'' tjyyjl ,d.verifyHaltTime,d.verifyHaltTime,d.verifyHaltTime,d.verifyHaltTime,'30451','30451','30451','30451','1','1','1','1','1','1','4','','','','1',
+d.workTime GS,d.standardCapacity,'0'from Equ_Mat_EquHaltGY d
+LEFT  OUTER JOIN 
+(SELECT Mes_CigaretteMachineShareDet.workCenterId workCenterId,Mes_CigaretteMachineShareDet.shareDate shareDate,Mes_CigaretteMachineShareDet.classLabel classLabel,sum(Mes_CigaretteMachineShareDet.actualoutput) cl
+ FROM Mes_CigaretteMachineShare,Mes_CigaretteMachineShareDet 
+WHERE Mes_CigaretteMachineShare.shareDate BETWEEN '2014-10-01 00:00:00.000' AND '2014-10-30 00:00:00.000'
+AND Mes_CigaretteMachineShare.mainStatus='0005'
+AND Mes_CigaretteMachineShare.id=Mes_CigaretteMachineShareDet.cigaretteMachineShareId
+AND Mes_CigaretteMachineShareDet.actualoutput<>'0'
+GROUP BY Mes_CigaretteMachineShareDet.workCenterId,Mes_CigaretteMachineShareDet.shareDate,Mes_CigaretteMachineShareDet.classLabel) f ON (d.workCenterId=f.workCenterId
+and d.classNum=f.classLabel  and d.haltDate=f.shareDate )
+LEFT OUTER JOIN Bas_WorkCenterInfo h ON (d.workCenterId=h.id)
+LEFT OUTER JOIN Equ_Bas_HaltCauseInfo J ON (d.haltCauseId=J.id)
+WHERE d.haltDate BETWEEN '2014-10-01 00:00:00.000' AND '2014-10-30 00:00:00.000'
+AND d.haltStatusCode='20'
+AND h.workCenterName LIKE '%卷烟机%'
+ORDER BY rq,d.classNum,h.workCenterCode
+
